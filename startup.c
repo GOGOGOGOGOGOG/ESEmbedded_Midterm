@@ -59,28 +59,28 @@ void reset_handler(void)
 void set_sysclk_pll(void)
 {
 	//enable HSE
-	SET_BIT(RCC_BASE + RCC_CR_OFFSET, HSEON_BIT);
+	SET_BIT(RCC_BASE + RCC_CR_OFFSET, HSION_BIT);
 
 	//wait
-	while (READ_BIT(RCC_BASE + RCC_CR_OFFSET, HSERDY_BIT) != 1)
+	while (READ_BIT(RCC_BASE + RCC_CR_OFFSET, HSIRDY_BIT) != 1)
 		;
 
 	//set pll
-	SET_BIT(RCC_BASE + RCC_PLLCFGR_OFFSET, PLLSRC_BIT); //use HSE for PLL source
+	CLEAR_BIT(RCC_BASE + RCC_PLLCFGR_OFFSET, PLLSRC_BIT); // use HSI for PLL source
 
-	//f_HSE = 8 MHz
+	//f_HSI = 16 MHz
 	//
 	//N = 168
 	//M = 4
 	//
-	//f_VCO = 8 * 168 / 4 = 168 * 2
+	//f_VCO = 16 * 168 / 4 = 168 * 4
 	//
-	//P = 2 
-	//f_HSE * N / M = 168*2
-	//168*2 / P = f_PLL_OUT
+	//P = 4
+	//f_HSI * N / M = 168*4
+	//168*4 / P = f_PLL_OUT
 	//f_PLL_out = 168
 	//
-	WRITE_BITS(RCC_BASE + RCC_PLLCFGR_OFFSET, PLLP_1_BIT, PLLP_0_BIT, 0b00);
+	WRITE_BITS(RCC_BASE + RCC_PLLCFGR_OFFSET, PLLP_1_BIT, PLLP_0_BIT, 0b01);
 	WRITE_BITS(RCC_BASE + RCC_PLLCFGR_OFFSET, PLLN_8_BIT, PLLN_0_BIT, 168);
 	WRITE_BITS(RCC_BASE + RCC_PLLCFGR_OFFSET, PLLM_5_BIT, PLLM_0_BIT, 4);
 
@@ -106,3 +106,4 @@ void set_sysclk_pll(void)
 		READ_BIT(RCC_BASE + RCC_CFGR_OFFSET, SWS_0_BIT) != 0)
 		;
 }
+
